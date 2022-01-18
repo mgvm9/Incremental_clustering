@@ -233,6 +233,14 @@ print(Dic)
 stream = ImplicitData(Data[0],Data[1])
 model = CLUBISGD(stream, Dic)
 
+eval = EvalPrequential(model,stream, metrics = ["Recall@20"])
+
+start_recommend = datetime.now()
+print('start time', start_recommend)
+
+resultados=eval.Evaluate(0,stream.size)
+
+print('sum(resultados[Recall@20])/stream.size', sum(resultados['Recall@20'])/stream.size)
 
 
 

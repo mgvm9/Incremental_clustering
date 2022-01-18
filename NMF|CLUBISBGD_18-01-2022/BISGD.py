@@ -31,8 +31,11 @@ class BISGD(Model):
         self._InitModel()
 
     def _InitModel(self):
-        self.user_factors = [[np.random.Generator.normal(0.0, 0.1, self.num_factors) for _ in range(self.data.maxuserid + 1)] for _ in range(self.num_nodes)]
-        self.item_factors = [[np.random.Generator.normal(0.0, 0.1, self.num_factors) for _ in range(self.data.maxitemid + 1)] for _ in range(self.num_nodes)]
+        print(type(self.num_factors))
+        print(type(self.data.maxuserid))
+        print(type(self.num_nodes))
+        self.user_factors = [[np.random.normal(0.0, 0.1, self.num_factors) for _ in range(self.data.maxuserid + 1)] for _ in range(self.num_nodes)]
+        self.item_factors = [[np.random.normal(0.0, 0.1, self.num_factors) for _ in range(self.data.maxitemid + 1)] for _ in range(self.num_nodes)]
 
 
     def BatchTrain(self):
