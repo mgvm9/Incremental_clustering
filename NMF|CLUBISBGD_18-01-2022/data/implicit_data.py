@@ -44,8 +44,10 @@ class ImplicitData:
 
     def AddFeedback(self, user, item):
         self.size = self.size + 1
-        self.userlist.append(user)
-        self.itemlist.append(item)
+        np.append(self.userlist,user)
+        #self.userlist.append(user)
+        #self.itemlist.append(item)
+        np.append(self.itemlist, item)
         if user not in self.userset:
             self.userset = np.append(self.userset, user)
             self.maxuserid = self.maxuserid + 1

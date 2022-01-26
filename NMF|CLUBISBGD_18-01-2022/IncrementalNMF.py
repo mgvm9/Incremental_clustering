@@ -20,13 +20,16 @@ import getopt
 import sys
 
 
+interleave = 100
+
+
 
 
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
 class CLUBISGD(BISGD):
-    def __init__(self, data: ImplicitData, clusters: dict, num_factors: int = 10, num_iterations: int = 10, num_nodes: int = 8, learn_rate: float = 0.01, u_regularization: float = 0.1, i_regularization: float = 0.1, random_seed: int = 1):
+    def __init__(self, data: ImplicitData, clusters: dict, num_factors: int = 10, num_iterations: int = 10, num_nodes: int = 10, learn_rate: float = 0.01, u_regularization: float = 0.1, i_regularization: float = 0.1, random_seed: int = 1):
         """    Constructor.
         Keyword arguments:
         data -- ImplicitData object
@@ -62,7 +65,12 @@ class CLUBISGD(BISGD):
                 self.item_factors[node].append(np.random.normal(0.0, 0.1, self.num_factors))
 
         for node in range(self.num_nodes):
+            print(node)
+            print(self.num_nodes)
+            print(user)
+            print(self.FuzzyClusters[user])
             k = self.FuzzyClusters[user][str(node)]
+            print(k)
 
             if k > 0.95/self.num_nodes: #higher than 95% from a random cluster allocation probability
                 #self._UpdateFactors(user_id, item_id, node)
@@ -172,7 +180,7 @@ with open(dataPath, 'r') as f:
         Data.append([float(row[0]),float(row[1])])
 
 feat = 10
-iters = 1000
+iters = 10
 
 lamb = 0.1
 eta = 1
@@ -214,23 +222,23 @@ for d in Data:
     B.append(B_i)
 
     for f in range(len(A_u)):
-        Dic[d[0]][f]= A_u[f]        
-        cluster_name = 'Cluster' + str(f)        
-        if(cluster_name not in Existing_Clusters):
-            C = cluster(cluster_name)
-            C.addPoint(d[0])
-            Existing_Clusters.append(cluster_name)
-            Clusters.append(C)
-        else:
-            for clust in Clusters:
-                if clust.name == cluster_name:
-                    clust.addPoint(f)
-    for f in range(len(unchanged_A_u)):
-        unchanged_Dic[d[0]][f]= unchanged_A_u[f]        
+        Dic[d[0]][str(f)]= A_u[f]        
+        #cluster_name = 'Cluster' + str(f)        
+        # if(cluster_name not in Existing_Clusters):
+        #     C = cluster(cluster_name)
+        #     C.addPoint(d[0])
+        #     Existing_Clusters.append(cluster_name)
+        #     Clusters.append(C)
+        # else:
+        #     for clust in Clusters:
+        #         if clust.name == cluster_name:
+        #             clust.addPoint(f)    
                       
                 
-print(Dic)
-stream = ImplicitData(Data[0],Data[1])
+#print(Dic)
+#print(Dic[22808.0])
+Data_Transpose = np.transpose(Data)
+stream = ImplicitData(Data_Transpose[0],Data_Transpose[1])
 model = CLUBISGD(stream, Dic)
 
 eval = EvalPrequential(model,stream, metrics = ["Recall@20"])
@@ -238,10 +246,18 @@ eval = EvalPrequential(model,stream, metrics = ["Recall@20"])
 start_recommend = datetime.now()
 print('start time', start_recommend)
 
-resultados=eval.Evaluate(0,stream.size)
+results=eval.Evaluate()
 
-print('sum(resultados[Recall@20])/stream.size', sum(resultados['Recall@20'])/stream.size)
+print('npmean(resuls[Recall@20])', np.mean(results['Recall@20']))
 
+end_recommend = datetime.now()
+print('end time', end_recommend)
 
+tempo = end_recommend - start_recommend
 
-
+print('run time', tempo)
+print('')
+print('get tuple',np.mean(results['time_get_tuple']))
+print('recommend',np.mean(results['time_recommend']))
+print('eval_point',np.mean(results['time_eval_point']))
+print('update',np.mean(results['time_update']))
